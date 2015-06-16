@@ -15,7 +15,13 @@
 		924EF4331A8FB96700B21619 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 924EF4311A8FB96700B21619 /* MainMenu.xib */; };
 		924EF43F1A8FB96700B21619 /* HiveTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 924EF43E1A8FB96700B21619 /* HiveTests.m */; };
 		926DA0021B2DD11C009872EA /* CameraCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 926DA0011B2DD11C009872EA /* CameraCapture.m */; };
-		926DA0061B2E23EF009872EA /* ImageProcessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 926DA0051B2E23EF009872EA /* ImageProcessor.m */; };
+		926DA0061B2E23EF009872EA /* ImageProcessor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 926DA0051B2E23EF009872EA /* ImageProcessor.mm */; };
+		926DA0121B2F2CAB009872EA /* features.h in Headers */ = {isa = PBXBuildFile; fileRef = 926DA0111B2F2CAB009872EA /* features.h */; };
+		926DA0141B2F2CAB009872EA /* featuresPriv.h in Headers */ = {isa = PBXBuildFile; fileRef = 926DA0131B2F2CAB009872EA /* featuresPriv.h */; };
+		926DA0161B2F2CAB009872EA /* features.cp in Sources */ = {isa = PBXBuildFile; fileRef = 926DA0151B2F2CAB009872EA /* features.cp */; };
+		926DA01A1B2F2CBC009872EA /* Harris.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 926DA0071B2F2C55009872EA /* Harris.cpp */; };
+		926DA01B1B2F2CBC009872EA /* Harris.h in Headers */ = {isa = PBXBuildFile; fileRef = 926DA0081B2F2C55009872EA /* Harris.h */; };
+		926DA01D1B2F3464009872EA /* libfeatures.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 926DA00F1B2F2CAB009872EA /* libfeatures.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,7 +51,14 @@
 		926DA0011B2DD11C009872EA /* CameraCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraCapture.m; sourceTree = "<group>"; };
 		926DA0031B2DD12C009872EA /* CameraCapture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraCapture.h; sourceTree = "<group>"; };
 		926DA0041B2E23D9009872EA /* ImageProcessor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImageProcessor.h; sourceTree = "<group>"; };
-		926DA0051B2E23EF009872EA /* ImageProcessor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageProcessor.m; sourceTree = "<group>"; };
+		926DA0051B2E23EF009872EA /* ImageProcessor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImageProcessor.mm; sourceTree = "<group>"; };
+		926DA0071B2F2C55009872EA /* Harris.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Harris.cpp; path = ../../features/src/Harris.cpp; sourceTree = "<group>"; };
+		926DA0081B2F2C55009872EA /* Harris.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Harris.h; path = ../../features/src/Harris.h; sourceTree = "<group>"; };
+		926DA00F1B2F2CAB009872EA /* libfeatures.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libfeatures.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		926DA0111B2F2CAB009872EA /* features.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = features.h; sourceTree = "<group>"; };
+		926DA0131B2F2CAB009872EA /* featuresPriv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = featuresPriv.h; sourceTree = "<group>"; };
+		926DA0151B2F2CAB009872EA /* features.cp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = features.cp; sourceTree = "<group>"; };
+		926DA01C1B2F2D21009872EA /* Image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Image.h; path = ../../features/src/Image.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,10 +66,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				926DA01D1B2F3464009872EA /* libfeatures.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		924EF4351A8FB96700B21619 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		926DA00C1B2F2CAB009872EA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -69,8 +90,10 @@
 		924EF4171A8FB96700B21619 = {
 			isa = PBXGroup;
 			children = (
+				926DA00A1B2F2C59009872EA /* features */,
 				924EF4221A8FB96700B21619 /* Hive */,
 				924EF43B1A8FB96700B21619 /* HiveTests */,
+				926DA0101B2F2CAB009872EA /* features */,
 				924EF4211A8FB96700B21619 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -80,6 +103,7 @@
 			children = (
 				924EF4201A8FB96700B21619 /* Hive.app */,
 				924EF4381A8FB96700B21619 /* HiveTests.xctest */,
+				926DA00F1B2F2CAB009872EA /* libfeatures.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -98,7 +122,7 @@
 				926DA0011B2DD11C009872EA /* CameraCapture.m */,
 				926DA0031B2DD12C009872EA /* CameraCapture.h */,
 				926DA0041B2E23D9009872EA /* ImageProcessor.h */,
-				926DA0051B2E23EF009872EA /* ImageProcessor.m */,
+				926DA0051B2E23EF009872EA /* ImageProcessor.mm */,
 			);
 			path = Hive;
 			sourceTree = "<group>";
@@ -129,7 +153,40 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		926DA00A1B2F2C59009872EA /* features */ = {
+			isa = PBXGroup;
+			children = (
+				926DA0071B2F2C55009872EA /* Harris.cpp */,
+				926DA0081B2F2C55009872EA /* Harris.h */,
+				926DA01C1B2F2D21009872EA /* Image.h */,
+			);
+			name = features;
+			sourceTree = "<group>";
+		};
+		926DA0101B2F2CAB009872EA /* features */ = {
+			isa = PBXGroup;
+			children = (
+				926DA0111B2F2CAB009872EA /* features.h */,
+				926DA0131B2F2CAB009872EA /* featuresPriv.h */,
+				926DA0151B2F2CAB009872EA /* features.cp */,
+			);
+			path = features;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		926DA00D1B2F2CAB009872EA /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				926DA01B1B2F2CBC009872EA /* Harris.h in Headers */,
+				926DA0141B2F2CAB009872EA /* featuresPriv.h in Headers */,
+				926DA0121B2F2CAB009872EA /* features.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		924EF41F1A8FB96700B21619 /* Hive */ = {
@@ -167,6 +224,23 @@
 			productReference = 924EF4381A8FB96700B21619 /* HiveTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		926DA00E1B2F2CAB009872EA /* features */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 926DA0171B2F2CAB009872EA /* Build configuration list for PBXNativeTarget "features" */;
+			buildPhases = (
+				926DA00B1B2F2CAB009872EA /* Sources */,
+				926DA00C1B2F2CAB009872EA /* Frameworks */,
+				926DA00D1B2F2CAB009872EA /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = features;
+			productName = features;
+			productReference = 926DA00F1B2F2CAB009872EA /* libfeatures.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -182,6 +256,9 @@
 					924EF4371A8FB96700B21619 = {
 						CreatedOnToolsVersion = 6.1.1;
 						TestTargetID = 924EF41F1A8FB96700B21619;
+					};
+					926DA00E1B2F2CAB009872EA = {
+						CreatedOnToolsVersion = 6.3.2;
 					};
 				};
 			};
@@ -200,6 +277,7 @@
 			targets = (
 				924EF41F1A8FB96700B21619 /* Hive */,
 				924EF4371A8FB96700B21619 /* HiveTests */,
+				926DA00E1B2F2CAB009872EA /* features */,
 			);
 		};
 /* End PBXProject section */
@@ -230,7 +308,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				924EF4291A8FB96700B21619 /* main.m in Sources */,
-				926DA0061B2E23EF009872EA /* ImageProcessor.m in Sources */,
+				926DA0061B2E23EF009872EA /* ImageProcessor.mm in Sources */,
 				924EF42C1A8FB96700B21619 /* GameScene.m in Sources */,
 				924EF4271A8FB96700B21619 /* AppDelegate.m in Sources */,
 				926DA0021B2DD11C009872EA /* CameraCapture.m in Sources */,
@@ -242,6 +320,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				924EF43F1A8FB96700B21619 /* HiveTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		926DA00B1B2F2CAB009872EA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				926DA01A1B2F2CBC009872EA /* Harris.cpp in Sources */,
+				926DA0161B2F2CAB009872EA /* features.cp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,6 +488,38 @@
 			};
 			name = Release;
 		};
+		926DA0181B2F2CAB009872EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		926DA0191B2F2CAB009872EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -430,6 +549,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		926DA0171B2F2CAB009872EA /* Build configuration list for PBXNativeTarget "features" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				926DA0181B2F2CAB009872EA /* Debug */,
+				926DA0191B2F2CAB009872EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

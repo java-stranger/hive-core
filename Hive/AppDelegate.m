@@ -110,13 +110,21 @@
    _capture = [[CameraCapture alloc] init];
    
    [_capture subscribe:_imageProcess];
-
+   
+   _imageProcess.drawLayer.zPosition = 1.;
+   _imageProcess.drawLayer.opacity = 0.5;
+   _imageProcess.drawLayer.frame = _skView.bounds;
+   _imageProcess.drawLayer.bounds = _skView.bounds;
+   [_skView.layer addSublayer:_imageProcess.drawLayer];
+   [_skView.layer setNeedsDisplay];
+   
    [self refreshCameraList:nil];
 
    [_capture setBounds:_skView.bounds];
 
    CALayer *layer = [_capture getPreviewLayer];
 //   layer.frame = _skView.bounds;
+   layer.opacity = 0.5;
    [_skView.layer addSublayer:layer];
 
    NSString* name = [[_cameras itemArray][0] title];
@@ -141,31 +149,32 @@
    [_capture setBounds:_skView.bounds];
 //   [_capture getPreviewLayer].frame = _skView.bounds;
 //   _previewLayer.frame = _skView.bounds;
+   _imageProcess.drawLayer.frame = _capture.previewLayer.bounds;
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
     return YES;
 }
 
-- (void)drawLayer:(CALayer *)theLayer inContext:(CGContextRef)theContext {
-   CGMutablePathRef thePath = CGPathCreateMutable();
-   
-   CGPathMoveToPoint(thePath,NULL,15.0f,15.f);
-   CGPathAddCurveToPoint(thePath,
-                         NULL,
-                         15.f,250.0f,
-                         295.0f,250.0f,
-                         295.0f,15.0f);
-   
-   CGContextBeginPath(theContext);
-   CGContextAddPath(theContext, thePath);
-   
-   CGContextSetLineWidth(theContext, 5);
-   CGContextStrokePath(theContext);
-   
-   // Release the path
-   CFRelease(thePath);
-}
+//- (void)drawLayer:(CALayer *)theLayer inContext:(CGContextRef)theContext {
+//   CGMutablePathRef thePath = CGPathCreateMutable();
+//   
+//   CGPathMoveToPoint(thePath,NULL,15.0f,15.f);
+//   CGPathAddCurveToPoint(thePath,
+//                         NULL,
+//                         15.f,250.0f,
+//                         295.0f,250.0f,
+//                         295.0f,15.0f);
+//   
+//   CGContextBeginPath(theContext);
+//   CGContextAddPath(theContext, thePath);
+//   
+//   CGContextSetLineWidth(theContext, 5);
+//   CGContextStrokePath(theContext);
+//   
+//   // Release the path
+//   CFRelease(thePath);
+//}
 
 @end
 

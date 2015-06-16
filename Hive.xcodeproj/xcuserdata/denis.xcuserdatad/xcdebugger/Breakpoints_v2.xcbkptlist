@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Hive/AppDelegate.m"
-            timestampString = "456011675.04009"
+            timestampString = "456059236.513263"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "123"
-            endingLineNumber = "123"
+            startingLineNumber = "131"
+            endingLineNumber = "131"
             landmarkName = "-applicationDidFinishLaunching:"
             landmarkType = "5">
          </BreakpointContent>
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Hive/CameraCapture.m"
-            timestampString = "456012307.82827"
+            timestampString = "456060806.125439"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "121"
-            endingLineNumber = "121"
+            startingLineNumber = "131"
+            endingLineNumber = "131"
             landmarkName = "-subscribe:"
             landmarkType = "5">
          </BreakpointContent>
@@ -41,12 +41,12 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Hive/ImageProcessor.m"
-            timestampString = "456009762.16859"
+            filePath = "Hive/ImageProcessor.mm"
+            timestampString = "456078447.318973"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "15"
-            endingLineNumber = "15"
+            startingLineNumber = "73"
+            endingLineNumber = "73"
             landmarkName = "-processFrame:"
             landmarkType = "5">
          </BreakpointContent>

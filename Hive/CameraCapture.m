@@ -58,7 +58,9 @@
 
 - (void) setMirror: (bool) enable {
    _connection.videoMirrored = enable;
-}
+   if(_subscriber) {
+      [_subscriber mirroringChanged:enable];
+   }}
 
 - (bool) isMirrored {
    return _connection.videoMirrored;
@@ -72,7 +74,7 @@
    
    _selectedCamera = name;
    
-   [session stopRunning];
+   [session beginConfiguration];
    [session removeConnection:_connection];
    
    for (AVCaptureDeviceInput *input in session.inputs) {
@@ -95,13 +97,18 @@
          _connection = conn;
          [session addInputWithNoConnections:input];
          [session addConnection:conn];
+         
+         if(_subscriber) {
+            [_subscriber inputChanged:input];
+            [_subscriber mirroringChanged:_connection.videoMirrored];
+         }
          break;
       }
    }
    
-   [self enableOutput:_outputEnabled];
-   [session startRunning];
    [self setBounds:_bounds];
+   [session commitConfiguration];
+   [self enableOutput:_outputEnabled];
 }
 
 - (NSArray*) getCameraList {
@@ -118,6 +125,9 @@
 
 - (void) subscribe: (NSObject <ProcessFrameDelegate>*) handler {
    _subscriber = handler;
+   if(_subscriber) {
+      [_subscriber mirroringChanged:[self isMirrored]];
+   }
 }
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput
@@ -180,7 +190,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
    videoDataOutput.videoSettings = newSettings;
    
    // discard if the data output queue is blocked (as we process the still image
-   [videoDataOutput setAlwaysDiscardsLateVideoFrames:YES];
+   [videoDataOutput setAlwaysDiscardsLateVideoFrames:NO];
    
    // create a serial dispatch queue used for the sample buffer delegate as well as when a still image is captured
    // a serial dispatch queue must be used to guarantee that video frames will be delivered in order

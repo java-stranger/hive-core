@@ -9,11 +9,13 @@
 #ifndef Hive_CameraCapture_h
 #define Hive_CameraCapture_h
 
-@import AVFoundation;
+#import <AVFoundation/AVFoundation.h>
 
 @protocol ProcessFrameDelegate <NSObject>
 
 - (void) processFrame: (CVPixelBufferRef) pixelBuffer;
+- (void) inputChanged: (AVCaptureDeviceInput*) input;
+- (void) mirroringChanged: (bool) mirrored;
 
 @end
 
