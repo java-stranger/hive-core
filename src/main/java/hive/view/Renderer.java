@@ -1,8 +1,8 @@
-package main.java.hive.view;
+package hive.view;
 
 import java.util.HashSet;
 
-import main.java.hive.engine.Coordinate;
+import hive.engine.Coordinate;
 
 public interface Renderer {
 	public void render(Tile t);

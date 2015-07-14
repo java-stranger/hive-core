@@ -1,4 +1,4 @@
-package main.java.hive.engine;
+package hive.engine;
 
 import java.util.HashMap;
 

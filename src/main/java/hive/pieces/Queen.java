@@ -1,10 +1,10 @@
-package main.java.hive.pieces;
+package hive.pieces;
 
 import java.util.HashSet;
 
-import main.java.hive.engine.Coordinate;
-import main.java.hive.engine.Player;
-import main.java.hive.engine.Position;
+import hive.engine.Coordinate;
+import hive.engine.Player;
+import hive.engine.Position;
 
 public class Queen extends Piece {
 	Queen(Player.Color color) {

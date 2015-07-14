@@ -1,10 +1,10 @@
-package main.java.hive.engine;
+package hive.engine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import main.java.hive.pieces.Piece;
-import main.java.hive.view.Table;
+import hive.pieces.Piece;
+import hive.view.Table;
 
 public class Game implements Controller {
 	
@@ -20,7 +20,7 @@ public class Game implements Controller {
 	
 	public Game() {
 		for(Player.Color c : Player.Color.values()) {
-			players.put(c, new main.java.hive.test.Player(c));
+			players.put(c, new hive.test.Player(c));
 		}
 		view = new Table(this);
 	}

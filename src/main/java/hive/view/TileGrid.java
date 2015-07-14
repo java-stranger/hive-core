@@ -1,6 +1,6 @@
-package main.java.hive.view;
+package hive.view;
 
-import main.java.hive.engine.Coordinate;
+import hive.engine.Coordinate;
 
 public class TileGrid {
 	

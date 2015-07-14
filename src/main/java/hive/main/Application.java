@@ -1,6 +1,6 @@
-package main.java.hive.main;
+package hive.main;
 
-import main.java.hive.engine.Game;
+import hive.engine.Game;
 
 public class Application {
 

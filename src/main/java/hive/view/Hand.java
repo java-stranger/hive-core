@@ -1,8 +1,8 @@
-package main.java.hive.view;
+package hive.view;
 
 import java.util.ArrayList;
 
-import main.java.hive.engine.Coordinate;
+import hive.engine.Coordinate;
 
 public class Hand {
 	private final Coordinate offset;

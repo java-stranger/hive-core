@@ -1,7 +1,7 @@
-package main.java.hive.view;
+package hive.view;
 
-import main.java.hive.engine.Coordinate;
-import main.java.hive.pieces.Piece;
+import hive.engine.Coordinate;
+import hive.pieces.Piece;
 
 public class Tile {
 	Coordinate pos;

@@ -1,11 +1,11 @@
-package main.java.hive.engine;
+package hive.engine;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import main.java.hive.pieces.Piece;
-import main.java.hive.view.PlayingField;
+import hive.pieces.Piece;
+import hive.view.PlayingField;
 
 public class Position {
 	

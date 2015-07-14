@@ -1,4 +1,4 @@
-package main.java.hive.engine;
+package hive.engine;
 
 public interface Controller {
 
