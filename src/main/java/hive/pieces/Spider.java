@@ -7,6 +7,9 @@ import hive.engine.Player;
 import hive.engine.Position;
 
 public class Spider  extends Piece {
+
+	private static final long serialVersionUID = 9221240447286666043L;
+
 	Spider(Player.Color color) {
 		super(color, PieceType.SPIDER);
 	}

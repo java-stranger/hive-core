@@ -7,6 +7,9 @@ import hive.engine.Player;
 import hive.engine.Position;
 
 public class Queen extends Piece {
+
+	private static final long serialVersionUID = 1887479588000358845L;
+
 	Queen(Player.Color color) {
 		super(color, PieceType.QUEEN);
 	}

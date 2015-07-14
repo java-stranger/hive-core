@@ -1,9 +1,12 @@
 package hive.engine;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public final class Coordinate {
+public final class Coordinate implements Serializable {
 	
+	private static final long serialVersionUID = -1924619317037201884L;
+
 	private Coordinate(int x, int y) { 
 		this.x = x; 
 		this.y = y; 
@@ -11,7 +14,11 @@ public final class Coordinate {
 	
 	static HashMap<Integer, HashMap<Integer, Coordinate>> pool = new HashMap<>();
 	
-	public static Coordinate getInstance(int x, int y) {
+	private Object readResolve() {
+		return getInstance(this.x, this.y);
+	}
+	
+	private static Coordinate getInstance(int x, int y) {
 		HashMap<Integer, Coordinate> row = pool.getOrDefault(x,	null);
 		if(row == null) {
 			row = new HashMap<Integer, Coordinate>();
@@ -38,10 +45,6 @@ public final class Coordinate {
 		return axial(this.x + another.x, this.y + another.y);
 	}
 
-	public boolean equals(Coordinate another) {
-		return this.x == another.x && this.y == another.y;
-	}
-	
 	public Coordinate inverse() {
 		return axial(-this.x, -this.y);
 	}

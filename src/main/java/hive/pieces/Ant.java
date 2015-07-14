@@ -8,6 +8,8 @@ import hive.engine.Position;
 
 public class Ant extends Piece {
 
+	private static final long serialVersionUID = -1420556873412200025L;
+
 	public Ant(Player.Color color) {
 		super(color, PieceType.ANT);
 	}

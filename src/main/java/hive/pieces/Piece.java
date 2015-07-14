@@ -1,13 +1,16 @@
 package hive.pieces;
 
+import java.io.Serializable;
 import java.util.HashSet;
 
 import hive.engine.Coordinate;
 import hive.engine.Player;
 import hive.engine.Position;
 
-public class Piece {
+abstract public class Piece implements Serializable {
 	
+	private static final long serialVersionUID = 6433412988687976036L;
+
 	Piece(Player.Color color, PieceType type) { 
 		this.color = color; 
 		this.type = type; 
@@ -44,5 +47,19 @@ public class Piece {
 		return type + "[" + (color == Player.Color.WHITE ? "w" : "b") + "]";
 	}
 	
-	public HashSet<Coordinate> getPossibleMoves(Position position) { return empty; }
+	@Override 
+	public boolean equals(Object other) {
+		if (!(other instanceof Piece)) {
+			return false;
+		}
+		Piece p = (Piece) other;
+		return this.type == p.type && this.color == p.color;
+	}
+	
+	@Override 
+	public int hashCode() {
+		return 31 * color.hashCode() + type.hashCode();
+	}
+	
+	abstract public HashSet<Coordinate> getPossibleMoves(Position position);
 }

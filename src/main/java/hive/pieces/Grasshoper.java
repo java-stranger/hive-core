@@ -7,6 +7,9 @@ import hive.engine.Player;
 import hive.engine.Position;
 
 public class Grasshoper extends Piece {
+
+	private static final long serialVersionUID = 2509198885858960198L;
+
 	Grasshoper(Player.Color color) {
 		super(color, PieceType.GRASSHOPER);
 	}

@@ -8,6 +8,8 @@ import hive.engine.Position;
 
 public class Bug extends Piece {
 
+	private static final long serialVersionUID = -5760446860941592937L;
+
 	public Bug(Player.Color color) {
 		super(color, PieceType.BUG);
 	}

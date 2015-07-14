@@ -1,19 +1,75 @@
 package hive.engine;
 
+import java.io.InvalidObjectException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map.Entry;
 
 import hive.pieces.Piece;
 import hive.view.PlayingField;
 
-public class Position {
+public class Position implements Serializable {
+	
+	private static final long serialVersionUID = 6740990797043611124L;
 	
 	Player.Color next_turn = Player.Color.WHITE;
-	PlayingField view = null;
+	private PlayingField view = null;
 
-	HashMap<Piece, Coordinate> pieces = new HashMap<>();
-	HashMap<Coordinate, Piece> coordinates = new HashMap<>();
+	private final HashMap<Piece, Coordinate> pieces = new HashMap<>();
+	private final HashMap<Coordinate, Piece> coordinates = new HashMap<>();
+	
+	private static class SerializationProxy implements Serializable {
+		private static final long serialVersionUID = 8277340064477621793L;
+		
+		final HashMap<Piece, Coordinate> pieces;
+		Player.Color next_turn;
+		SerializationProxy(Position pos) {
+			this.pieces = pos.pieces;
+			next_turn = pos.next_turn;
+		}
+
+		public Object readResolve() {
+			Position pos = new Position();
+			this.pieces.forEach((Piece p, Coordinate c) -> pos.insert(p, c));
+			pos.next_turn = next_turn;
+			return pos;
+		}
+	}
+	
+	public Object readResolve() throws InvalidObjectException {
+		throw new InvalidObjectException("Requires proxy!");
+	}
+	
+	private Object writeReplace() {
+		return new SerializationProxy(this);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof Position)) {
+			return false;
+		}
+		Position pos = (Position) obj;
+		return this.next_turn == pos.next_turn 
+				&& this.pieces.equals(pos.pieces)
+				&& this.coordinates.equals(pos.coordinates);
+	}
+	
+	@Override
+	public String toString() {
+		String res = "";
+		if(pieces.size() < 4) {
+			for(Entry<Piece, Coordinate> entry : pieces.entrySet()) {
+				res += entry.getKey() + "@" + entry.getValue() + "; ";
+			} 
+		} else {
+			res = "Has " + pieces.size() + " pieces; ";
+		}
+		
+		return res + next_turn + "'s turn";
+	}
 	
 	public void subscribeView(PlayingField view) {
 		this.view = view;
