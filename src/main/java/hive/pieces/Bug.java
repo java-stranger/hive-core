@@ -1,10 +1,10 @@
-package hive.pieces;
+package main.java.hive.pieces;
 
 import java.util.HashSet;
 
-import hive.engine.Coordinate;
-import hive.engine.Player;
-import hive.engine.Position;
+import main.java.hive.engine.Coordinate;
+import main.java.hive.engine.Player;
+import main.java.hive.engine.Position;
 
 public class Bug extends Piece {
 

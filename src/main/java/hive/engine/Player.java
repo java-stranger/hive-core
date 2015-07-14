@@ -1,11 +1,11 @@
-package hive.engine;
+package main.java.hive.engine;
 
 import java.util.ArrayList;
 
-import hive.pieces.Piece;
-import hive.pieces.PieceSet;
-import hive.pieces.PieceType;
-import hive.view.Hand;
+import main.java.hive.pieces.Piece;
+import main.java.hive.pieces.PieceSet;
+import main.java.hive.pieces.PieceType;
+import main.java.hive.view.Hand;
 
 public abstract class Player {
 	protected ArrayList<Piece> remaining = new ArrayList<>();

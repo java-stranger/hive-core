@@ -1,9 +1,9 @@
-package hive.pieces;
+package main.java.hive.pieces;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import hive.engine.Player;
+import main.java.hive.engine.Player;
 
 public class PieceSet {
 	final static HashMap<PieceType, Integer> set;

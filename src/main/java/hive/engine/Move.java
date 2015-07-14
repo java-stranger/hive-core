@@ -1,6 +1,6 @@
-package hive.engine;
+package main.java.hive.engine;
 
-import hive.pieces.Piece;
+import main.java.hive.pieces.Piece;
 
 public class Move {
 	

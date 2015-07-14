@@ -1,12 +1,12 @@
-package hive.view;
+package main.java.hive.view;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
-import hive.engine.Coordinate;
-import hive.engine.Player;
-import hive.pieces.Piece;
-import hive.view.Renderer.HighlightType;
+import main.java.hive.engine.Coordinate;
+import main.java.hive.engine.Player;
+import main.java.hive.pieces.Piece;
+import main.java.hive.view.Renderer.HighlightType;
 
 public class PlayingField {
 	

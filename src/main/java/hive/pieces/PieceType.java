@@ -1,4 +1,4 @@
-package hive.pieces;
+package main.java.hive.pieces;
 
 public enum PieceType {
 	QUEEN("Queen"),

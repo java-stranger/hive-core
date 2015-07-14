@@ -1,12 +1,12 @@
-package hive.view;
+package main.java.hive.view;
 
 import java.util.HashMap;
 
-import hive.engine.Coordinate;
-import hive.engine.Game;
-import hive.engine.Player;
-import hive.engine.Player.Color;
-import hive.pieces.Piece;
+import main.java.hive.engine.Coordinate;
+import main.java.hive.engine.Game;
+import main.java.hive.engine.Player;
+import main.java.hive.engine.Player.Color;
+import main.java.hive.pieces.Piece;
 
 public class Table {
 	
