@@ -59,4 +59,13 @@ public final class Coordinate implements Serializable {
 	public String toString() {
 		return "(" + x + "," + y +"," + z()+")";
 	}
+	
+	public Coordinate[] getNeighbors() {
+		final Coordinate[] neighbors = 
+			{ Coordinate.axial(x+0,y+1), Coordinate.axial(x+1,y+0),
+			  Coordinate.axial(x+1,y-1), Coordinate.axial(x+0,y-1),
+			  Coordinate.axial(x-1,y+0), Coordinate.axial(x-1,y+1) };
+		return neighbors;
+	}
+
 }

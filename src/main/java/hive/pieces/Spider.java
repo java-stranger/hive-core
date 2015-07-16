@@ -5,6 +5,7 @@ import java.util.HashSet;
 import hive.engine.Coordinate;
 import hive.engine.Player;
 import hive.engine.Position;
+import hive.engine.PositionUtils;
 
 public class Spider  extends Piece {
 
@@ -15,11 +16,9 @@ public class Spider  extends Piece {
 	}
 	
 	@Override
-	public HashSet<Coordinate> getPossibleMoves(Position board) {
-		Coordinate pos = board.position(this);
-		assert pos != null;
-		if(board.canMove(this))
-			return board.getAccesibleCells(pos, 3);
+	public HashSet<Coordinate> getPossibleMoves(Position board, Coordinate current) {
+		if(board.canMove(current))
+			return PositionUtils.getSpiderMoves(board, current);
 		else 
 			return empty;
 	}

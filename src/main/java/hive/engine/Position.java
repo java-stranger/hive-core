@@ -2,14 +2,20 @@ package hive.engine;
 
 import java.io.InvalidObjectException;
 import java.io.Serializable;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 import hive.pieces.Piece;
 import hive.view.PlayingField;
 
+/**
+ * @author mac
+ *
+ */
 public class Position implements Serializable {
 	
 	private static final long serialVersionUID = 6740990797043611124L;
@@ -17,23 +23,29 @@ public class Position implements Serializable {
 	Player.Color next_turn = Player.Color.WHITE;
 	private PlayingField view = null;
 
-	private final HashMap<Piece, Coordinate> pieces = new HashMap<>();
-	private final HashMap<Coordinate, Piece> coordinates = new HashMap<>();
+	private final HashMap<Coordinate, ArrayList<Piece>> coordinates = new HashMap<>();
 	
 	private static class SerializationProxy implements Serializable {
 		private static final long serialVersionUID = 8277340064477621793L;
 		
-		final HashMap<Piece, Coordinate> pieces;
+		final ArrayList<Entry<Coordinate, Piece>> piecesCollection = new ArrayList<>();
 		Player.Color next_turn;
 		SerializationProxy(Position pos) {
-			this.pieces = pos.pieces;
 			next_turn = pos.next_turn;
+			pos.coordinates.entrySet().forEach((Entry<Coordinate, ArrayList<Piece>> entry) -> {
+				if(entry.getValue() != null) {
+					entry.getValue().forEach((Piece p) 
+							-> piecesCollection.add(new SimpleEntry<Coordinate, Piece>(entry.getKey(), p)));
+				}
+			});
 		}
 
 		public Object readResolve() {
 			Position pos = new Position();
-			this.pieces.forEach((Piece p, Coordinate c) -> pos.insert(p, c));
+			this.piecesCollection.forEach((Entry<Coordinate, Piece> e) 
+					-> pos.insert(e.getValue(), e.getKey()));
 			pos.next_turn = next_turn;
+			pos.checkInvariants();
 			return pos;
 		}
 	}
@@ -53,19 +65,18 @@ public class Position implements Serializable {
 		}
 		Position pos = (Position) obj;
 		return this.next_turn == pos.next_turn 
-				&& this.pieces.equals(pos.pieces)
 				&& this.coordinates.equals(pos.coordinates);
 	}
 	
 	@Override
 	public String toString() {
 		String res = "";
-		if(pieces.size() < 4) {
-			for(Entry<Piece, Coordinate> entry : pieces.entrySet()) {
-				res += entry.getKey() + "@" + entry.getValue() + "; ";
+		if(coordinates.size() < 4) {
+			for(Entry<Coordinate, ArrayList<Piece>> entry : coordinates.entrySet()) {
+				res += entry.getValue() + "@" + entry.getKey() + "; ";
 			} 
 		} else {
-			res = "Has " + pieces.size() + " pieces; ";
+			res = "Has " + coordinates.size() + " pieces; ";
 		}
 		
 		return res + next_turn + "'s turn";
@@ -75,221 +86,87 @@ public class Position implements Serializable {
 		this.view = view;
 	}
 	
+	public void iterateAll(BiConsumer<? super Coordinate, ? super Piece> consumer) {
+		for(Entry<Coordinate, ArrayList<Piece>> entry : coordinates.entrySet())
+			for(Piece p : entry.getValue())
+				consumer.accept(entry.getKey(), p);
+	}
+	
+	public void iterateTopLevel(BiConsumer<? super Coordinate, ? super Piece> consumer) {
+		for(Entry<Coordinate, ArrayList<Piece>> entry : coordinates.entrySet())
+			consumer.accept(entry.getKey(), entry.getValue().get(entry.getValue().size() - 1));
+	}
+	
+	public boolean iterateTopLevelWhile(BiFunction<? super Coordinate, ? super Piece, Boolean> consumer) {
+		for(Entry<Coordinate, ArrayList<Piece>> entry : coordinates.entrySet())
+			if(!consumer.apply(entry.getKey(), entry.getValue().get(entry.getValue().size() - 1)))
+				return false;
+		return true;
+	}
+	
+	/**
+	 * @return Number of visible (top-level) pieces. Might be different from the total number
+	 * of pieces (if some of them are hidden by bugs)
+	 */
+	public int numTopPieces() {
+		return coordinates.size();
+	}
+	
 	public void reset() {
-		pieces.clear();
+		if(view != null) {
+			iterateAll((Coordinate c, Piece p) -> view.removePiece(p, c));
+		}
 		coordinates.clear();
-		if(view != null) view.reset();
 		next_turn = Player.Color.WHITE;
 	}
 
-	public void move(Piece p, Coordinate from, Coordinate to) {
-		assert pieces.get(p) == from && coordinates.get(from) == p && isFree(to);
-		pieces.put(p, to);
-		coordinates.put(to, p);
-		coordinates.remove(from);
+	private void move(Piece p, Coordinate from, Coordinate to) {
+		if(coordinates.get(from) == null || !coordinates.get(from).contains(p)
+				|| (!isFree(to) && !p.canSitOnTopOfOthers()))
+			throw new IllegalStateException("Cannot move "+ p + " from "+ from + "to" + to + "!");
+		
+		coordinates.computeIfAbsent(to, (Coordinate c) -> new ArrayList<Piece>()).add(p);
+		coordinates.get(from).remove(p);
+		if (coordinates.get(from).isEmpty()) coordinates.remove(from);
 		if(view != null) view.movePiece(p, from, to);
 	}
 
-	public void insert(Piece p, Coordinate at) {
-		assert !pieces.containsKey(p) && isFree(at);
-		pieces.put(p, at);
-		coordinates.put(at, p);
+	private void insert(Piece p, Coordinate at) {
+		if(!isFree(at)) 
+			throw new IllegalStateException("Cannot insert@"+ at + ": already taken!");
+		
+		coordinates.computeIfAbsent(at, (Coordinate c) -> new ArrayList<Piece>()).add(p);
 		if(view != null) view.playPiece(p, at);
 	}
 	
-	public void remove(Piece p) {
-		assert pieces.containsKey(p);
-		coordinates.remove(pieces.get(p), p);
-		pieces.remove(p);
-		if(view != null) view.removePiece(p);
+	private void remove(Piece p, Coordinate at) {
+		if(coordinates.get(at) == null || !coordinates.get(at).contains(p))
+			throw new IllegalStateException("Cannot remove "+ p + "@"+ at + ": not found!");
+		coordinates.get(at).remove(p);
+		if (coordinates.get(at).isEmpty()) coordinates.remove(at);
+		if(view != null) view.removePiece(p, at);
 	}
 	
-	public Coordinate getCoordinate(Piece p) {
-		return pieces.get(p);
-	}
-
-	public Piece getPieceAt(Coordinate pos) {
-		return coordinates.get(pos);
+	public Piece getTopPieceAt(Coordinate pos) {
+		if(coordinates.get(pos) == null)
+			return null;
+		return coordinates.get(pos).get(coordinates.get(pos).size() - 1);
 	}
 
 	public boolean isFree(Coordinate pos) {
 		return !coordinates.containsKey(pos);
 	}
-
-	static public Coordinate[] getNeighbors(Coordinate pos) {
-		final Coordinate[] neighbors = 
-			{ Coordinate.axial(pos.x()+0,pos.y()+1), Coordinate.axial(pos.x()+1,pos.y()+0),
-			  Coordinate.axial(pos.x()+1,pos.y()-1), Coordinate.axial(pos.x()+0,pos.y()-1),
-			  Coordinate.axial(pos.x()-1,pos.y()+0), Coordinate.axial(pos.x()-1,pos.y()+1) };
-		return neighbors;
-	}
-
-	public HashSet<Coordinate> getAccesibleCells(Coordinate pos, int distance) {
-		Piece p = coordinates.remove(pos); // temporarily remove piece from the field
-		HashSet<Coordinate> visited = new HashSet<>();
-		HashSet<Coordinate> to_visit;
-		HashSet<Coordinate> to_visit_next = new HashSet<>();
-		to_visit_next.add(pos);
-		
-		while(!to_visit_next.isEmpty()) {
-			if(distance == 0) {
-				break;
-//				for(Coordinate v : to_visit_next)
-//					visited.add(v);
-//				break;
-			}
-			to_visit = to_visit_next;
-			to_visit_next = new HashSet<>();
-			for(Coordinate v : to_visit) {
-				visited.add(v);
-				for(Coordinate c : getAccesibleNeighboringCells(v)) {
-					if(!visited.contains(c) && !to_visit.contains(c) && isAttached(c))
-						to_visit_next.add(c);
-				}
-			}
-			distance--;
-		}
-		
-//		visited.remove(pos);
-		coordinates.put(pos, p); // restore the piece
-		return to_visit_next;
-	}
-
-	public HashSet<Coordinate> getAccesibleCellsRamping(Coordinate pos) {
-		Piece piece = coordinates.remove(pos); // temporarily remove piece from the field
-		HashSet<Coordinate> visited = new HashSet<>();
-		HashSet<Coordinate> to_visit = new HashSet<>();
-		to_visit.add(pos);
-		
-		while(!to_visit.isEmpty()) {
-			Coordinate c = to_visit.iterator().next();
-			visited.add(c);
-			to_visit.remove(c);
-			for(Coordinate n : getAccesibleNeighboringCells(c)) {
-				if(!visited.contains(n) && isAttached(c))
-					to_visit.add(n);
-			}
-		}
-		
-		coordinates.put(pos, piece); // restore the piece
-		visited.remove(pos);
-		return visited;
-	}
-
-	public boolean isAttached(Coordinate pos) {
-		for(Coordinate n: getNeighbors(pos)) {
-			if(!isFree(n))
-				return true;
-		}
-		return false;
-	}
-
-	public HashSet<Coordinate> getAccesibleNeighboringCells(Coordinate pos) {
-		HashSet<Coordinate> res = new HashSet<>();
-		Coordinate[] neighbors = getNeighbors(pos); 
-		boolean[] places = new boolean[neighbors.length];
-		int i = 0;
-		for(Coordinate n : neighbors) {
-			places[i++] = isFree(n);
-		}
-		
-		for(i = 0; i < places.length; ++i) {
-			// we can move to a cell iff it's free, and at least one of its adjacent cells is free, too
-			if(places[i] 
-				&& (places[(i + places.length - 1) % places.length] != places[(i + 1) % places.length]))
-					res.add(neighbors[i]);
-		}
-		return res;
-	}
 	
-	public HashSet<Coordinate> getAccesibleForBugNeighboringCells(Coordinate pos) {
-		Piece p = coordinates.remove(pos); // temporarily remove piece from the field
-		HashSet<Coordinate> res = new HashSet<>();
-		for(Coordinate n: getNeighbors(pos)) {
-			if(isAttached(n))
-				res.add(n);
-		}
-		coordinates.put(pos, p); // restore the piece
-		return res;
+	private void checkInvariants() {
+		if(!PositionUtils.connected(this))
+			throw new IllegalStateException("Would result in disconnected position!");
 	}
-	
-	public boolean stillConnectedIfRemoved(Piece without) {
-		assert pieces.containsKey(without);
-
-		if(pieces.size() == 1) return false; // the only piece, cannot move!
 		
-		Coordinate cell_to_ignore = pieces.get(without);
-		
-		HashSet<Coordinate> visited = new HashSet<Coordinate>();
-		HashSet<Coordinate> to_visit = new HashSet<Coordinate>();
-
-		// Start from any neighbor of the ignored cell 
-		for(Coordinate n : getNeighbors(cell_to_ignore)) {
-			if(!isFree(n)) {
-				to_visit.add(n);
-				break;
-			}
-		}
-		assert !to_visit.isEmpty();
-		
-		// Now, perform BFS 
-		while(!to_visit.isEmpty()) {
-			Coordinate p = to_visit.iterator().next();
-			visited.add(p);
-			to_visit.remove(p);
-			for(Coordinate n: getNeighbors(p)) {
-				if(!isFree(n) && !visited.contains(n) && n != cell_to_ignore)
-					to_visit.add(n);
-			}
-//			System.out.println("Visiting " + p);
-		}
-		return visited.size() == pieces.size() - 1; // -1 for the ignored cell
-	}
-	
-	public Coordinate position(Piece p) {
-		return pieces.get(p);
-	}
-	
-	public boolean canMove(Piece p) {
-		return stillConnectedIfRemoved(p);
-	}
-
-	public HashSet<Coordinate> getPossibleInsertionCells(Player.Color color) {
-		HashSet<Coordinate> adjacentFree = new HashSet<>();
-		if(pieces.isEmpty()) {
-			adjacentFree.add(Coordinate.cube(0, 0, 0));
-			return adjacentFree;
-		} else if (pieces.size() == 1) {
-			for(Coordinate n: getNeighbors(pieces.values().iterator().next())) {
-				adjacentFree.add(n);
-			}
-			return adjacentFree;
-		}
-		
-		// First, get all adjacent free cells
-		for(Coordinate c: pieces.values()) {
-			for(Coordinate n: getNeighbors(c)) {
-				if(isFree(n)) {
-					adjacentFree.add(n);
-				}
-			}
-		}
-		assert adjacentFree.isEmpty() == false;
-		
-		// Now, remove those that have adjacent of adversary color
-		Iterator<Coordinate> it = adjacentFree.iterator();
-		while(it.hasNext()){
-			Coordinate c = it.next();
-			for(Coordinate n: getNeighbors(c)) {
-				Piece p = getPieceAt(n);
-				if(p != null && p.color() != color) {
-					it.remove();
-					break;
-				}
-			}
-		}
-		assert !adjacentFree.isEmpty();
-		return adjacentFree;
+	public boolean canMove(Coordinate item) {
+		Piece p = virtuallyRemove(item);
+		boolean canMove = PositionUtils.connected(this);
+		virtuallyPlaceBack(p, item);
+		return canMove;
 	}
 	
 	public Position accept(Move m) {
@@ -303,6 +180,8 @@ public class Position implements Serializable {
 			System.out.println(m.piece + " is moved from " + m.from + " to " + m.to);
 		}
 		next_turn = next_turn.next();
+		
+		checkInvariants();
 		return this;
 	}
 	
@@ -310,14 +189,26 @@ public class Position implements Serializable {
 		assert next_turn != m.piece.color(); // can only undo the last move
 		
 		if(m.from == null) {
-			remove(m.piece);
+			remove(m.piece, m.to);
 			System.out.println(m.piece + " is removed at " + m.to);
 		} else {
 			move(m.piece, m.to, m.from);
 			System.out.println(m.piece + " is moved back from " + m.to + " to " + m.from);
 		}
 		next_turn = next_turn.next();
+
+		checkInvariants();
 		return this;
+	}
+	
+	Piece virtuallyRemove(Coordinate at) {
+		Piece p = coordinates.get(at).remove(coordinates.get(at).size() - 1); 
+		if (coordinates.get(at).isEmpty()) coordinates.remove(at);
+		return p;
+	}
+
+	void virtuallyPlaceBack(Piece p, Coordinate at) {
+		coordinates.computeIfAbsent(at, (Coordinate c) -> new ArrayList<Piece>()).add(p);
 	}
 
 }

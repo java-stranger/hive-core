@@ -5,6 +5,7 @@ import java.util.HashSet;
 import hive.engine.Coordinate;
 import hive.engine.Move;
 import hive.engine.Position;
+import hive.engine.PositionUtils;
 import hive.pieces.Piece;
 
 public class Player extends hive.engine.Player {
@@ -19,7 +20,7 @@ public class Player extends hive.engine.Player {
 		
 		if(p == null) return null;
 		
-		HashSet<Coordinate> positions = board.getPossibleInsertionCells(this.color());
+		HashSet<Coordinate> positions = PositionUtils.getPossibleInsertionCells(board, this.color());
 		
 		return new Move(p, null, positions.iterator().next());
 	}

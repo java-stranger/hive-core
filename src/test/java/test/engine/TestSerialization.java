@@ -1,4 +1,4 @@
-package hive.engine;
+package test.engine;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -12,6 +12,9 @@ import java.io.ObjectOutputStream;
 
 import org.junit.Test;
 
+import hive.engine.Coordinate;
+import hive.engine.Move;
+import hive.engine.Position;
 import hive.engine.Player.Color;
 import hive.pieces.Piece;
 import hive.pieces.PieceType;
@@ -88,9 +91,10 @@ public class TestSerialization {
 		assertEquals(pos, readObject(stream));
 		
 		pos.accept(new Move(Piece.createNew(Color.WHITE, PieceType.ANT), null, Coordinate.axial(0, 0)));
-//		pos.accept(new Move(Piece.createNew(Color.BLACK, PieceType.BUG), null, Coordinate.axial(1, 0)));
-//		pos.accept(new Move(pos.getPieceAt(Coordinate.axial(0, 0)), Coordinate.axial(0, 0), Coordinate.axial(1, 1)));
-//		pos.accept(new Move(Piece.createNew(Color.BLACK, PieceType.QUEEN), null, Coordinate.axial(4, -2)));
+		pos.accept(new Move(Piece.createNew(Color.BLACK, PieceType.BUG), null, Coordinate.axial(1, 0)));
+		pos.accept(new Move(pos.getTopPieceAt(Coordinate.axial(0, 0)), Coordinate.axial(0, 0), Coordinate.axial(1, 1)));
+		pos.accept(new Move(Piece.createNew(Color.BLACK, PieceType.QUEEN), null, Coordinate.axial(2, -1)));
+		pos.accept(new Move(Piece.createNew(Color.WHITE, PieceType.BUG), null, Coordinate.axial(0, 2)));
 
 		stream = writeObject(pos);
 		assertEquals(pos, readObject(stream));

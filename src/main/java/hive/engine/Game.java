@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import hive.pieces.Piece;
+import hive.view.Hand;
 import hive.view.Table;
 
 public class Game implements Controller {
@@ -16,7 +17,7 @@ public class Game implements Controller {
 	
 	private final ArrayList<Move> history = new ArrayList<>();
 	
-	private Piece selected = null;
+	private Coordinate selected = null;
 	
 	public Game() {
 		for(Player.Color c : Player.Color.values()) {
@@ -26,7 +27,7 @@ public class Game implements Controller {
 	}
 
 	public void start() {
-//		reset();
+		reset();
 	}
 	
 	public void reset() {
@@ -66,70 +67,85 @@ public class Game implements Controller {
 	public void makeMove(Move move) {
 		position.accept(move);
 		history.add(move);
-		refreshSelection();		
+		clearSelection();		
 	}
 	
 	public void clearSelection() {
 		selected = null;
 		view.field.showPossibleMoves(null);
 		view.field.showAdversaryMoves(null);
+		view.field.setSelected(null);
 	}
 	
-	public void refreshSelection() {
-		if(selected != null) {
-			if(players.get(selected.color()).remaining.contains(selected)) {
-				onPieceChoosenInHand(selected);
-			} else {
-				onPieceChoosenInField(selected);
-			}
-		}
-	}
 	public void undoLastMove() {
 		if(!history.isEmpty()) {
 			Move m = history.remove(history.size() - 1);
 			position.undo(m);
 			players.get(m.piece.color()).newPiece(m.piece);
-			refreshSelection();
+			clearSelection();
 		}
 	}
 
-	public void onPieceChoosenInHand(Piece p) {
-		selected = p;
+	public void onPieceChoosenInHand(Piece p, Coordinate c) {
+		selected = c;
 		if(p.color() == nextPlayer().color()) {
-			System.out.println("Showing possible moves");			
-			view.field.showPossibleMoves(position.getPossibleInsertionCells(p.color()));
+			System.out.println("Showing possible moves (insertion)");			
+			view.field.showPossibleMoves(PositionUtils.getPossibleInsertionCells(position, nextPlayer().color()));
 		} else {
-			view.field.showAdversaryMoves(position.getPossibleInsertionCells(p.color()));
+			System.out.println("Showing adversary possible moves (insertion)");			
+			view.field.showAdversaryMoves(PositionUtils.getPossibleInsertionCells(position, p.color()));
 		}
+		view.field.setSelected(c);
 	}
 
-	public void onPieceChoosenInField(Piece p) {
-		selected = p;
+	public void onPieceChoosenInField(Piece p, Coordinate c) {
+		selected = c;
 		if(p.color() == position.next_turn) {
 			System.out.println("Showing possible moves");			
-			view.field.showPossibleMoves(p.getPossibleMoves(position));
+			view.field.showPossibleMoves(p.getPossibleMoves(position, c));
 		} else {
 			System.out.println("Showing adversary possible moves");			
-			view.field.showAdversaryMoves(p.getPossibleMoves(position));
+			view.field.showAdversaryMoves(p.getPossibleMoves(position, c));
 		}
+		view.field.setSelected(c);
 	}
 	
 	public void onClick(Coordinate c) {
-		if(selected != null && selected.color() == nextPlayer().color())
-		{
-			if(nextPlayer().remaining.contains(selected) 
-					&& position.getPossibleInsertionCells(selected.color()).contains(c)) {
-				// make this move!
-				nextPlayer().remaining.remove(selected);
-				makeMove(new Move(selected, null, c));
-			} else if(position.getCoordinate(selected) != null 
-					&& selected.getPossibleMoves(position).contains(c)) {
-				makeMove(new Move(selected, position.getCoordinate(selected), c));
-			} else {
-				System.out.println("Moving " + selected + " to " + c + " is not allowed!");			
-			}
+		Piece p = position.getTopPieceAt(c);
+		if(p != null) {
+			onPieceChoosenInField(p, c);
 		} else {
+			for(Hand h : view.hands.values()) {
+				p = h.getPieceAt(c); 
+				if(p != null)
+					break;
+			}
+			if(p != null)
+				onPieceChoosenInHand(p, c);
 		}
+		if(p == null)
+			clearSelection();
+
+//		Piece p = position.getTopPieceAt(selected);
+//		if(p != null && p.color() == nextPlayer().color())
+//		{
+//			if(nextPlayer().remaining.contains(selected) 
+//					&& PositionUtils.getPossibleInsertionCells(position, p.color()).contains(c)) {
+//				// make this move!
+//				nextPlayer().remaining.remove(selected);
+//				makeMove(new Move(p, null, c));
+//			} else if(selected != null 
+//					&& p.getPossibleMoves(position, c).contains(c)) {
+//				makeMove(new Move(p, selected, c));
+//			} else {
+//				System.out.println("Moving " + selected + " to " + c + " is not allowed!");			
+//			}
+//		} else {
+//		}
+	}
+	
+	public void savePosition(String filename) {
+		
 	}
 
 }

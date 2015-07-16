@@ -5,6 +5,7 @@ import java.util.HashSet;
 import hive.engine.Coordinate;
 import hive.engine.Player;
 import hive.engine.Position;
+import hive.engine.PositionUtils;
 
 public class Bug extends Piece {
 
@@ -15,14 +16,15 @@ public class Bug extends Piece {
 	}
 	
 	@Override
-	public HashSet<Coordinate> getPossibleMoves(Position board) {
-		Coordinate pos = board.position(this);
-		assert pos != null;
-		if(board.canMove(this)) {
-			return board.getAccesibleForBugNeighboringCells(pos);
+	public HashSet<Coordinate> getPossibleMoves(Position board, Coordinate current) {
+		if(board.canMove(current)) {
+			return PositionUtils.getBugMoves(board, current);
 		}
 		else 
 			return empty;
 	}
 
+	public boolean canSitOnTopOfOthers() {
+		return true;
+	}
 }

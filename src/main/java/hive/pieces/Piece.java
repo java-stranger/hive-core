@@ -61,5 +61,9 @@ abstract public class Piece implements Serializable {
 		return 31 * color.hashCode() + type.hashCode();
 	}
 	
-	abstract public HashSet<Coordinate> getPossibleMoves(Position position);
+	abstract public HashSet<Coordinate> getPossibleMoves(Position position, Coordinate current);
+	
+	public boolean canSitOnTopOfOthers() {
+		return false;
+	}
 }

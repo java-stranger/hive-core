@@ -3,10 +3,13 @@ package hive.view;
 import java.util.HashSet;
 
 import hive.engine.Coordinate;
+import hive.pieces.Piece;
 
 public interface Renderer {
-	public void render(Tile t);
-	public void forget(Tile t);
+	
+	public void newPiece(Piece p, Coordinate c);
+	public void movePiece(Piece p, Coordinate from, Coordinate to);
+	public Object removePiece(Piece p, Coordinate c);
 	
 	public enum HighlightType {
 		MY_MOVES,
@@ -14,4 +17,5 @@ public interface Renderer {
 	}
 
 	void highlight(HashSet<Coordinate> coords, HighlightType type);
+	void select(Coordinate coord);
 }

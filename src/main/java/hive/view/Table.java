@@ -26,6 +26,7 @@ public class Table {
 	}
 	
 	private void initHands() {
+		hands.clear();
 		int topY = -h / 2;
 
 		int topLeftX = 0 - w / 2;
@@ -39,12 +40,11 @@ public class Table {
 		
 		for(Color color : game.players.keySet()) {
 			Player pl = game.players.get(color);
-			pl.getPieces().forEach((Piece p) -> field.insertPiece(p, hands.get(color).getNextPos()));
+			pl.getPieces().forEach((Piece p) -> field.insertPiece(p, hands.get(color).allocate(p)));
 		}
 	}
 
 	public void reset() {
-		field.reset();
 		initHands();
 	}
 
@@ -52,21 +52,21 @@ public class Table {
 		return hands.get(c);
 	}
 	
-	public void onTileSelected(Tile t) {
-		if(t == null) {
-			game.clearSelection();
-			return;
-		}
-		
-		// First, find out where the tile is selected
-		if(game.players.get(t.piece.color()).getPieces().contains(t.piece)) {
-			System.out.println("Choosen piece on the hand of: " + game.players.get(t.piece.color()));
-			game.onPieceChoosenInHand(t.piece);
-		} else {
-			System.out.println("Choosen piece on the field!");
-			game.onPieceChoosenInField(t.piece);
-		}		
-	}
+//	public void onTileSelected(Tile t) {
+//		if(t == null) {
+//			game.clearSelection();
+//			return;
+//		}
+//		
+//		// First, find out where the tile is selected
+//		if(game.players.get(t.piece.color()).getPieces().contains(t.piece)) {
+//			System.out.println("Choosen piece on the hand of: " + game.players.get(t.piece.color()));
+//			game.onPieceChoosenInHand(t.pos);
+//		} else {
+//			System.out.println("Choosen piece on the field!");
+//			game.onPieceChoosenInField(t.pos);
+//		}		
+//	}
 
 	public void onClick(Coordinate c) {
 		game.onClick(c);
