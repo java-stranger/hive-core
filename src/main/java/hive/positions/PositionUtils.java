@@ -1,6 +1,5 @@
 package hive.positions;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -91,13 +90,13 @@ public class PositionUtils {
 		boolean[] places = new boolean[neighbors.length];
 		int i = 0;
 		for(Coordinate n : neighbors) {
-			places[i++] = (ignore != n ? pos.isFree(n) : (pos.getBelowPieceAt(n, 1) == null));
+			places[i++] = (!n.equals(ignore) ? pos.isFree(n) : (pos.getPieceAt(n, 1) == null));
 		}
 		
 		for(i = 0; i < places.length; ++i) {
 			if(allowed_to_step_over) {
 				// we are not allowed to lose the connection with neighbors, all other moves are ok 
-				if(pos.getBelowPieceAt(start, 1) != null || !places[i] || !places[(i + places.length - 1) % places.length] || !places[(i + 1) % places.length])
+				if(pos.getPieceAt(start, 1) != null || !places[i] || !places[(i + places.length - 1) % places.length] || !places[(i + 1) % places.length])
 					res.add(neighbors[i]);
 			} else {
 				// we can move to a cell iff it's free, and at least one of its adjacent cells is free, too
@@ -196,7 +195,7 @@ public class PositionUtils {
 	
 	public static boolean connected(IPosition position) {
 		HashSet<Coordinate> connected = new HashSet<>();
-		Coordinate start = position.getStartingPoint();
+		Coordinate start = position.getAnyPoint();
 		if(start == null)
 			return true;
 		
@@ -283,10 +282,12 @@ public class PositionUtils {
 
 	public static boolean canMove(IPosition position, Piece piece, Coordinate item) {
 		assert piece.equals(position.getTopPieceAt(item));
-		
+
+		path.clear();
+
 //		System.out.println(piece + "@" + item + " canmove");
 
-		if(position.getBelowPieceAt(item, 1) != null)
+		if(position.getPieceAt(item, 1) != null)
 			return true; // bug sitting on top of another piece can always move
 		
 		int i = 1, mask = 0;
@@ -310,20 +311,26 @@ public class PositionUtils {
 		// need to check the connection
 		if(mask == 0b101010 || mask == 0b010101) {
 			// special case, 3 "legs"
-		} else {
-			// Common 2 "legs"-case: need to find a way from one leg to the other
+			path.add(item);
+			if(!buildShortestRoute(position, path, item.getNeighbors()[legInfo[mask].leg1], 
+					legInfo[mask].leg1, item.getNeighbors()[legInfo[mask].leg2]))
+				return false; // cannot connect leg1 & leg2
+			if( path.contains(item.getNeighbors()[legInfo[mask].leg3]))
+				return true;
 			path.clear();
+			return buildShortestRoute(position, path, item.getNeighbors()[legInfo[mask].leg2],
+							legInfo[mask].leg2, item.getNeighbors()[legInfo[mask].leg3]);
+		} else {
+			// Common 2 "legs"-case: need to find a path from one leg to the other
 			path.add(item);
 			return buildShortestRoute(position, path, item.getNeighbors()[legInfo[mask].leg1], 
 					legInfo[mask].leg1, item.getNeighbors()[legInfo[mask].leg2]);
 		}
-		
-		return false;
 	}
 	
 	
 	static boolean buildShortestRoute(IPosition position, HashSet<Coordinate> path, Coordinate next, int next_pos, Coordinate starting_point) {
-		if(next == starting_point)
+		if(next.equals(starting_point))
 			return true;
 		path.add(next);
 		

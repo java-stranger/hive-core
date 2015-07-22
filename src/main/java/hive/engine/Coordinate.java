@@ -1,9 +1,6 @@
 package hive.engine;
 
 import java.io.Serializable;
-import java.util.HashMap;
-
-import hive.pieces.Piece;
 
 public final class Coordinate implements Serializable {
 	

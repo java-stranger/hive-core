@@ -19,6 +19,10 @@ public class TileGrid {
 		this.offY = offY;
 	}
 	
+	public float tileSize() {
+		return tileSize;
+	}
+	
 	public float pixelX(Coordinate c) {
 		final float coeff = tileSize * 3.f/2; 
 		return coeff * c.x() + offX;

@@ -2,6 +2,7 @@ package hive.positions;
 
 import java.io.Serializable;
 
+import hive.engine.Move;
 import hive.player.IPlayer;
 
 public interface IPositionChecker extends  Serializable {

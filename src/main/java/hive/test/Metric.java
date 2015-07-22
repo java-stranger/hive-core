@@ -2,7 +2,7 @@ package hive.test;
 
 import java.util.ArrayList;
 
-import hive.positions.Move;
+import hive.engine.Move;
 
 public class Metric {
 	public int numPiecesMoveableMe = 0;

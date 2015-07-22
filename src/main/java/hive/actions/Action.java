@@ -1,8 +1,9 @@
 package hive.actions;
 
 import hive.engine.Coordinate;
-import hive.engine.Game;
+import hive.engine.Move;
 import hive.pieces.Piece;
+import hive.positions.IPosition;
 
 public abstract class Action {
 	protected final Coordinate start;
@@ -18,9 +19,9 @@ public abstract class Action {
 	public static Action create(ActionType type, Coordinate start) {
 		switch(type) {
 		case INSERT:
-			return new Insert(start);
+			return new InsertAction(start);
 		case MOVE:
-			return new Move(start);
+			return new MoveAction(start);
 		}
 		return null;
 	}
@@ -29,7 +30,7 @@ public abstract class Action {
 		return create(type, start).setPiece(p);
 	}
 
-	abstract public boolean check(Game game, Coordinate end); 
+	abstract public boolean check(IPosition position, Coordinate end); 
 	
 	public Piece getPiece() {
 		return piece;
@@ -57,7 +58,7 @@ public abstract class Action {
 		return type;
 	}
 	
-	abstract public hive.positions.Move createMove(Coordinate end);
+	abstract public Move createMove(Coordinate end);
 	
 	public String toString() {
 		return type + " " + piece + ": started@" + start;

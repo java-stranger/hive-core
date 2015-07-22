@@ -5,20 +5,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 import hive.engine.Coordinate;
+import hive.engine.Move;
 import hive.pieces.Piece;
 import hive.pieces.PieceType;
 import hive.player.IPlayer;
-import hive.player.IPlayer.Color;
-import hive.positions.Move;
-import hive.positions.Position;
+import hive.positions.CheckedPosition;
+import hive.positions.IPlayable;
 
 public class TestUtils {
 	public static <T> Set<T> toSet(T[] array) {
 		return new HashSet<>(Arrays.asList(array));
 	}
 	
-	public static Position position1() {
-		Position pos = new Position();
+	public static IPlayable position1() {
+		CheckedPosition pos = new CheckedPosition();
 		
 		pos.accept(new Move(Piece.createNew(IPlayer.Color.WHITE, PieceType.ANT), null, Coordinate.axial(0, 0)));
 		pos.accept(new Move(Piece.createNew(IPlayer.Color.BLACK, PieceType.BUG), null, Coordinate.axial(1, 0)));

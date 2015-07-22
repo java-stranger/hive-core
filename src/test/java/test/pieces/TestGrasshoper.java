@@ -1,11 +1,11 @@
 package test.pieces;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
 import hive.engine.Coordinate;
-import hive.positions.Position;
+import hive.positions.IPosition;
 import hive.positions.PositionUtils;
 import test.common.TestUtils;
 
@@ -13,7 +13,7 @@ public class TestGrasshoper {
 
 	@Test
 	public void test() {
-		Position pos = TestUtils.position1();
+		IPosition pos = TestUtils.position1();
 		
 		{
 			Coordinate[] expected = {Coordinate.axial(1, -1)};

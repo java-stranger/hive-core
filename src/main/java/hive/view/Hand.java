@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 
 import hive.engine.Coordinate;
 import hive.pieces.Piece;
+import hive.positions.IPosition;
+import hive.positions.PositionUtils;
 
 public class Hand {
 	private final Coordinate offset;
@@ -17,9 +19,12 @@ public class Hand {
 
 	int gridNo = 1;
 	
-	Hand(Coordinate offset, boolean inversed) {
+	final IPosition position;
+	
+	Hand(IPosition position, Coordinate offset, boolean inversed) {
 		this.offset = offset;
 		this.inverse = inversed;
+		this.position = position;
 		
 		initGrid(gridNo, inversed, offset, null);
 	}
@@ -91,10 +96,10 @@ public class Hand {
 		return allocated.get(c);
 	}
 	
-	public void reshuffle(int gridNo, Renderer renderer, HashSet<Coordinate> avoid) {
+	public void rearrangeToAvoidClash(int gridNo, Renderer renderer) {
 		LinkedHashMap<Coordinate, Piece> oldAllocated = allocated;
 		allocated = new LinkedHashMap<>();
-		initGrid(gridNo, inverse, offset, avoid);
+		initGrid(gridNo, inverse, offset, PositionUtils.getExternalBorder(position));
 		oldAllocated.entrySet().forEach((Entry<Coordinate, Piece> entry) -> {
 			Coordinate to = placeInHand(entry.getValue()); 
 			if(renderer != null) renderer.movePiece(entry.getValue(), entry.getKey(), to);

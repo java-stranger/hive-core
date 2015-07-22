@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import hive.player.IPlayer;
-import hive.positions.Position;
-import hive.positions.CheckedPositionTraits;
-import hive.positions.Move;
+import hive.positions.CheckedPosition;
+import hive.positions.IPlayable;
+import hive.positions.IPosition;
+import hive.positions.ViewablePosition;
 import hive.test.Player;
-import hive.view.Table;
 
-public class Game implements Controller {
+public class Game {
 	
 	public final HashMap<IPlayer.Color, Player> players = new HashMap<>();
 	
-	public Position position = new Position(new CheckedPositionTraits());
+	public final ViewablePosition viewablePosition = new ViewablePosition();
 	
-	public Table view;
+	public final IPlayable position = new CheckedPosition(viewablePosition);
 	
 	private final ArrayList<Move> history = new ArrayList<>();
 	
@@ -24,17 +24,9 @@ public class Game implements Controller {
 		for(IPlayer.Color c : IPlayer.Color.values()) {
 			players.put(c, new hive.test.Player(c));
 		}
-		view = new Table(this);
 	}
 
 	public void start() {
-		reset();
-	}
-	
-	public void reset() {
-		players.values().forEach((IPlayer pl) -> pl.reset());
-		position.reset();
-		view.reset();
 	}
 	
 	public void test() {
@@ -47,6 +39,10 @@ public class Game implements Controller {
 			if(++num_moves > 2)
 				break;
 		}
+	}
+	
+	public IPosition position() {
+		return position;
 	}
 	
 	public IPlayer nextPlayer() {
@@ -70,7 +66,6 @@ public class Game implements Controller {
 		position.accept(move);
 		history.add(move);
 		players.values().forEach((IPlayer pl) -> pl.notify(move));
-		view.clearSelection();		
 	}
 	
 	public void undoLastMove() {
@@ -79,7 +74,6 @@ public class Game implements Controller {
 			System.out.println("Undo move: " + m);
 			position.undo(m);
 			players.values().forEach((IPlayer pl) -> pl.notifyUndo(m));
-			view.clearSelection();
 		}
 	}
 
@@ -101,16 +95,4 @@ public class Game implements Controller {
 //		} else {
 //		}
 	
-	public void savePosition(String filename) {
-		System.out.println("Saving to " + filename);
-	}
-
-	public void loadPosition(String filename) {
-		System.out.println("Loading from " + filename);
-	}
-
-	public void displayBorder() {
-		view.displayExternalBorder();
-	}
-
 }

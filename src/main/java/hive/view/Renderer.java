@@ -19,6 +19,4 @@ public interface Renderer {
 
 	void highlight(HashSet<Coordinate> coords, HighlightType type);
 	void select(Coordinate coord);
-	
-	void reset();
 }

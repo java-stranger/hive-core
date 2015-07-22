@@ -2,9 +2,9 @@ package hive.player;
 
 import java.util.function.BiConsumer;
 
+import hive.engine.Move;
 import hive.pieces.Piece;
 import hive.pieces.PieceSet;
-import hive.positions.Move;
 
 public abstract class AbstractPlayer implements IPlayer {
 		

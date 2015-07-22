@@ -13,12 +13,11 @@ import java.io.ObjectOutputStream;
 import org.junit.Test;
 
 import hive.engine.Coordinate;
+import hive.engine.Move;
 import hive.pieces.Piece;
 import hive.pieces.PieceType;
 import hive.player.IPlayer;
-import hive.player.IPlayer.Color;
-import hive.positions.Move;
-import hive.positions.Position;
+import hive.positions.SimplePosition;
 
 public class TestSerialization {
 	
@@ -87,8 +86,8 @@ public class TestSerialization {
 	@Test
 	public void testPosition() throws IOException, ClassNotFoundException {
 		byte[] stream;
-		Position pos = new Position();
-		stream = writeObject(new Position());
+		SimplePosition pos = new SimplePosition();
+		stream = writeObject(new SimplePosition());
 		assertEquals(pos, readObject(stream));
 		
 		pos.accept(new Move(Piece.createNew(IPlayer.Color.WHITE, PieceType.ANT), null, Coordinate.axial(0, 0)));

@@ -1,6 +1,7 @@
 package hive.positions;
 
 import hive.engine.Coordinate;
+import hive.engine.Move;
 import hive.player.IPlayer;
 
 public class PositionChecker implements IPositionChecker {
@@ -38,11 +39,12 @@ public class PositionChecker implements IPositionChecker {
 					+ ": already occupied by " + position.getTopPieceAt(move.from) + "!");
 		}
 		
-		for(Coordinate n : move.from.getNeighbors()) {
-			if(!position.isFree(n)) { // check if the destination is "attached" to other pieces
-				return true;
+		if(move.from != null)
+			for(Coordinate n : move.from.getNeighbors()) {
+				if(!position.isFree(n)) { // check if the destination is "attached" to other pieces
+					return true;
+				}
 			}
-		}
 
 		return false;
 	}

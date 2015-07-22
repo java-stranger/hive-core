@@ -2,10 +2,9 @@ package hive.player;
 
 import java.util.function.BiConsumer;
 
-import hive.engine.Coordinate;
+import hive.engine.Move;
 import hive.pieces.Piece;
 import hive.positions.IPosition;
-import hive.positions.Move;
 
 public interface IPlayer {
 

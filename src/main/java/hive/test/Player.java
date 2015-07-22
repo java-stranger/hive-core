@@ -1,23 +1,22 @@
 package hive.test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 import hive.engine.Coordinate;
+import hive.engine.Move;
 import hive.pieces.Piece;
 import hive.player.AbstractPlayer;
 import hive.player.IPlayer;
-import hive.positions.Position;
 import hive.positions.IPosition;
-import hive.positions.Move;
 import hive.positions.PositionUtils;
+import hive.positions.SimplePosition;
 
 public class Player extends AbstractPlayer {
 	
 	Random rand = new Random(1234567876531L);
 	
-	Position position = new Position();
+	SimplePosition position = new SimplePosition();
 	
 	protected AbstractPlayer otherPlayer;
 
@@ -36,7 +35,7 @@ public class Player extends AbstractPlayer {
 	public void reset() {
 		super.reset();
 		otherPlayer.reset();
-		position.reset();
+		position = new SimplePosition();
 	}
 	
 	public void notify(Move move) {

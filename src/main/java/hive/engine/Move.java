@@ -1,11 +1,11 @@
-package hive.positions;
+package hive.engine;
 
 import java.io.Serializable;
 
 import hive.engine.Coordinate;
 import hive.pieces.Piece;
 
-public class Move implements Serializable {
+public final class Move implements Serializable {
 	
 	private static final long serialVersionUID = 7560605941860039091L;
 
@@ -18,6 +18,7 @@ public class Move implements Serializable {
 		this.to = to;
 	}
 	
+	@Override
 	public boolean equals(Object other) {
 		if(!(other instanceof Move))
 			return false;
@@ -25,6 +26,12 @@ public class Move implements Serializable {
 		return piece.equals(move.piece) && from == move.from && to == move.to;  
 	}
 	
+	@Override
+	public int hashCode() {
+		return 17 + 31 * (piece.hashCode() + 31 * (from.hashCode() + 31 * to.hashCode())); 
+	}
+	
+	@Override
 	public String toString() {
 		return piece + ": " + from + " -> " + to;
 	}
