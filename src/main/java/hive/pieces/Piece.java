@@ -4,27 +4,28 @@ import java.io.Serializable;
 import java.util.HashSet;
 
 import hive.engine.Coordinate;
-import hive.engine.Player;
-import hive.engine.Position;
+import hive.player.IPlayer;
+import hive.positions.IPosition;
+import hive.positions.PositionUtils;
 
 abstract public class Piece implements Serializable {
 	
 	private static final long serialVersionUID = 6433412988687976036L;
 
-	Piece(Player.Color color, PieceType type) { 
+	Piece(IPlayer.Color color, PieceType type) { 
 		this.color = color; 
 		this.type = type; 
 	}
 	
 	final static HashSet<Coordinate> empty = new HashSet<>();
 	
-	final Player.Color color;
+	final IPlayer.Color color;
 	final PieceType type;
 	
 	public PieceType getType() { return type; }
-	public Player.Color color() { return color; } 
+	public IPlayer.Color color() { return color; } 
 	
-	public static Piece createNew(Player.Color color, PieceType type) {
+	public static Piece createNew(IPlayer.Color color, PieceType type) {
 		switch(type) {
 		case QUEEN:
 			return new Queen(color);
@@ -44,7 +45,7 @@ abstract public class Piece implements Serializable {
 	}
 	
 	public String toString() {
-		return type + "[" + (color == Player.Color.WHITE ? "w" : "b") + "]";
+		return type + "[" + (color == IPlayer.Color.WHITE ? "w" : "b") + "]";
 	}
 	
 	@Override 
@@ -58,10 +59,18 @@ abstract public class Piece implements Serializable {
 	
 	@Override 
 	public int hashCode() {
-		return 31 * color.hashCode() + type.hashCode();
+		return 17 + 31 * color.hashCode() + type.hashCode();
 	}
 	
-	abstract public HashSet<Coordinate> getPossibleMoves(Position position, Coordinate current);
+	abstract public HashSet<Coordinate> getMoves(IPosition position, Coordinate current);
+	
+	public HashSet<Coordinate> getPossibleMoves(IPosition position, Coordinate current) {
+		if(PositionUtils.canMove(position, this, current)) {
+			return getMoves(position, current);
+		}
+		else 
+			return empty;
+	}
 	
 	public boolean canSitOnTopOfOthers() {
 		return false;

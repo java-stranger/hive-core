@@ -3,24 +3,25 @@ package hive.engine;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import hive.pieces.Piece;
-import hive.view.Hand;
+import hive.player.IPlayer;
+import hive.positions.Position;
+import hive.positions.CheckedPositionTraits;
+import hive.positions.Move;
+import hive.test.Player;
 import hive.view.Table;
 
 public class Game implements Controller {
 	
-	public final HashMap<Player.Color, Player> players = new HashMap<>();
+	public final HashMap<IPlayer.Color, Player> players = new HashMap<>();
 	
-	public Position position = new Position();
+	public Position position = new Position(new CheckedPositionTraits());
 	
 	public Table view;
 	
 	private final ArrayList<Move> history = new ArrayList<>();
 	
-	private Coordinate selected = null;
-	
 	public Game() {
-		for(Player.Color c : Player.Color.values()) {
+		for(IPlayer.Color c : IPlayer.Color.values()) {
 			players.put(c, new hive.test.Player(c));
 		}
 		view = new Table(this);
@@ -31,8 +32,7 @@ public class Game implements Controller {
 	}
 	
 	public void reset() {
-		clearSelection();
-		players.values().forEach((Player pl) -> pl.reset());
+		players.values().forEach((IPlayer pl) -> pl.reset());
 		position.reset();
 		view.reset();
 	}
@@ -49,15 +49,16 @@ public class Game implements Controller {
 		}
 	}
 	
-	public Player nextPlayer() {
-		return players.get(position.next_turn);
+	public IPlayer nextPlayer() {
+		return players.get(position.nextTurn());
 	}
 	
 	public void nextMove() {
-		Move move = nextPlayer().nextMove(position);
+		IPlayer player = nextPlayer();
+		Move move = player.nextMove(position);
 		
 		if(move == null) {
-			System.out.println("Game over: player " + nextPlayer() + " cannot move!");
+			System.out.println("Game over: player " + player + " cannot move!");
 			return;
 		}
 		
@@ -65,67 +66,24 @@ public class Game implements Controller {
 	}
 	
 	public void makeMove(Move move) {
+		System.out.println("Make move: " + move);
 		position.accept(move);
 		history.add(move);
-		clearSelection();		
-	}
-	
-	public void clearSelection() {
-		selected = null;
-		view.field.showPossibleMoves(null);
-		view.field.showAdversaryMoves(null);
-		view.field.setSelected(null);
+		players.values().forEach((IPlayer pl) -> pl.notify(move));
+		view.clearSelection();		
 	}
 	
 	public void undoLastMove() {
 		if(!history.isEmpty()) {
 			Move m = history.remove(history.size() - 1);
+			System.out.println("Undo move: " + m);
 			position.undo(m);
-			players.get(m.piece.color()).newPiece(m.piece);
-			clearSelection();
+			players.values().forEach((IPlayer pl) -> pl.notifyUndo(m));
+			view.clearSelection();
 		}
 	}
 
-	public void onPieceChoosenInHand(Piece p, Coordinate c) {
-		selected = c;
-		if(p.color() == nextPlayer().color()) {
-			System.out.println("Showing possible moves (insertion)");			
-			view.field.showPossibleMoves(PositionUtils.getPossibleInsertionCells(position, nextPlayer().color()));
-		} else {
-			System.out.println("Showing adversary possible moves (insertion)");			
-			view.field.showAdversaryMoves(PositionUtils.getPossibleInsertionCells(position, p.color()));
-		}
-		view.field.setSelected(c);
-	}
-
-	public void onPieceChoosenInField(Piece p, Coordinate c) {
-		selected = c;
-		if(p.color() == position.next_turn) {
-			System.out.println("Showing possible moves");			
-			view.field.showPossibleMoves(p.getPossibleMoves(position, c));
-		} else {
-			System.out.println("Showing adversary possible moves");			
-			view.field.showAdversaryMoves(p.getPossibleMoves(position, c));
-		}
-		view.field.setSelected(c);
-	}
 	
-	public void onClick(Coordinate c) {
-		Piece p = position.getTopPieceAt(c);
-		if(p != null) {
-			onPieceChoosenInField(p, c);
-		} else {
-			for(Hand h : view.hands.values()) {
-				p = h.getPieceAt(c); 
-				if(p != null)
-					break;
-			}
-			if(p != null)
-				onPieceChoosenInHand(p, c);
-		}
-		if(p == null)
-			clearSelection();
-
 //		Piece p = position.getTopPieceAt(selected);
 //		if(p != null && p.color() == nextPlayer().color())
 //		{
@@ -142,10 +100,17 @@ public class Game implements Controller {
 //			}
 //		} else {
 //		}
-	}
 	
 	public void savePosition(String filename) {
-		
+		System.out.println("Saving to " + filename);
+	}
+
+	public void loadPosition(String filename) {
+		System.out.println("Loading from " + filename);
+	}
+
+	public void displayBorder() {
+		view.displayExternalBorder();
 	}
 
 }

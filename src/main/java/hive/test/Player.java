@@ -1,28 +1,137 @@
 package hive.test;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 import hive.engine.Coordinate;
-import hive.engine.Move;
-import hive.engine.Position;
-import hive.engine.PositionUtils;
 import hive.pieces.Piece;
+import hive.player.AbstractPlayer;
+import hive.player.IPlayer;
+import hive.positions.Position;
+import hive.positions.IPosition;
+import hive.positions.Move;
+import hive.positions.PositionUtils;
 
-public class Player extends hive.engine.Player {
+public class Player extends AbstractPlayer {
+	
+	Random rand = new Random(1234567876531L);
+	
+	Position position = new Position();
+	
+	protected AbstractPlayer otherPlayer;
 
-	public Player(Color color) {
+	private int numMoves = 0; 
+
+	public Player(IPlayer.Color color) {
 		super(color);
+		otherPlayer = new AbstractPlayer(color.next()) {
+			@Override
+			public Move nextMove(IPosition board) {
+				return null;
+			}
+		};
 	}
 	
-	public Move nextMove(Position board) {
+	public void reset() {
+		super.reset();
+		otherPlayer.reset();
+		position.reset();
+	}
+	
+	public void notify(Move move) {
+		position.accept(move);
+		try {
+			super.notify(move);  // only one of the two can throw, normally
+			otherPlayer.notify(move);
+		} catch (Throwable e) {
+			position.undo(move);  // Can throw as well... Then we lose e, and everything...
+			throw e;
+		}
+	}
+
+	public void notifyUndo(Move move) {
+		position.undo(move);
+		try {
+			super.notifyUndo(move); // only one of the two can throw, normally
+			otherPlayer.notifyUndo(move);
+		} catch (Throwable e) {
+			position.accept(move); // Can throw as well... Then we lose e, and everything...
+			throw e;
+		}
+	}
+
+	
+	public ArrayList<Move> getMoves(IPosition board) {
 		
-		Piece p = getPiece(null); // choose the first one
+		ArrayList<Move> moves = new ArrayList<>();
+
+		board.forEachVisible((Coordinate at, Piece p) -> {
+			if(p.color() == board.nextTurn() && PositionUtils.canMove(board, p, at)) {
+				for(Coordinate to : p.getPossibleMoves(board, at)) {
+					moves.add(new Move(p, at, to));
+				}
+			}
+		});
 		
-		if(p == null) return null;
+		IPlayer player = board.nextTurn() == this.color() ? this : otherPlayer;
 		
-		HashSet<Coordinate> positions = PositionUtils.getPossibleInsertionCells(board, this.color());
+		player.remaining((Piece p, Integer num) -> {
+			PositionUtils.getPossibleInsertionCells(board, this.color()).forEach((Coordinate to) -> {
+				moves.add(new Move(p, null, to));
+			});
+		});
 		
-		return new Move(p, null, positions.iterator().next());
+		return moves;
+	}
+
+	public Move nextMove(IPosition board) {
+		assert position.equals(board);
+		
+		long started = System.currentTimeMillis(); 
+		numMoves = 1;
+		
+		Metric metric = evaluate(position, 3);
+		
+		long took = (System.currentTimeMillis() - started);
+		System.out.println("Best sequence: " + metric);
+		System.out.println("Analyzed " + numMoves + " positions in " + took + "ms (" + (1000 * took / numMoves) + "us/position)");
+		
+		return metric.moves.get(0);
+	}
+	
+	Metric evaluate(IPosition board, int max_depth) {
+		Metric m = new Metric();
+		ArrayList<Move> moves = getMoves(board);
+
+		if(board.nextTurn() == color()) {
+			m.numPiecesMoveableMe = moves.size();
+		} else {
+			m.numPiecesMoveableAdv = moves.size();
+		}
+
+		if(max_depth <= 1) {
+//			System.out.println("Reached max depth, metric " + m);
+			++numMoves;
+			return m;
+		}
+		
+		Move best_move = null;
+		
+//		System.out.println(max_depth + ": Possible moves: " + moves.get(board.nextTurn()));
+
+		for(Move move : moves) {
+//			System.out.println(max_depth + ": Checking move " + move);
+			notify(move);
+			Metric metric = evaluate(board, max_depth - 1);
+			notifyUndo(move);
+			if(best_move == null || metric.isBetter(m)) {
+				best_move = move;
+				m = metric;
+			}
+		};
+		
+		return m.addFront(best_move);
 	}
 
 }

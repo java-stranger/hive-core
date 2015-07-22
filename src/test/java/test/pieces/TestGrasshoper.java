@@ -5,8 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import hive.engine.Coordinate;
-import hive.engine.Position;
-import hive.engine.PositionUtils;
+import hive.positions.Position;
+import hive.positions.PositionUtils;
 import test.common.TestUtils;
 
 public class TestGrasshoper {

@@ -3,24 +3,21 @@ package hive.pieces;
 import java.util.HashSet;
 
 import hive.engine.Coordinate;
-import hive.engine.Player;
-import hive.engine.Position;
-import hive.engine.PositionUtils;
+import hive.player.IPlayer;
+import hive.positions.IPosition;
+import hive.positions.PositionUtils;
 
 public class Queen extends Piece {
 
 	private static final long serialVersionUID = 1887479588000358845L;
 
-	Queen(Player.Color color) {
+	Queen(IPlayer.Color color) {
 		super(color, PieceType.QUEEN);
 	}
 	
 	@Override
-	public HashSet<Coordinate> getPossibleMoves(Position board, Coordinate current) {
-		if(board.canMove(current))
-			return PositionUtils.getQueenMoves(board, current);
-		else 
-			return empty;
+	public HashSet<Coordinate> getMoves(IPosition board, Coordinate current) {
+		return PositionUtils.getQueenMoves(board, current);
 	}
 
 }

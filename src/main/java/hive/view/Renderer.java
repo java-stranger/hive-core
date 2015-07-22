@@ -13,9 +13,12 @@ public interface Renderer {
 	
 	public enum HighlightType {
 		MY_MOVES,
-		ADVERSARY_MOVES
+		ADVERSARY_MOVES,
+		BORDER
 	}
 
 	void highlight(HashSet<Coordinate> coords, HighlightType type);
 	void select(Coordinate coord);
+	
+	void reset();
 }

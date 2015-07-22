@@ -4,20 +4,24 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import hive.engine.Coordinate;
-import hive.engine.Player;
+import hive.engine.Game;
 import hive.pieces.Piece;
+import hive.player.IPlayer;
+import hive.positions.PositionUtils;
 import hive.view.Renderer.HighlightType;
 
 public class PlayingField {
 	
-	public final HashMap<Player.Color, Hand> hands;
+	public final HashMap<IPlayer.Color, Hand> hands;
 	
 	private Renderer renderer;
 	
 	int width;
 	int height;
+	Game game;
 	
-	public PlayingField(int w, int h, HashMap<Player.Color, Hand> hands) {
+	public PlayingField(Game game, int w, int h, HashMap<IPlayer.Color, Hand> hands) {
+		this.game = game;
 		width = w;
 		height = h;
 		this.hands = hands;
@@ -27,13 +31,19 @@ public class PlayingField {
 		this.renderer = renderer;
 	}
 	
+	public void reset() {
+		if(renderer != null)
+			renderer.reset();
+	}
+	
 	public void movePiece(Piece p, Coordinate from, Coordinate to) {
-		if(renderer != null) renderer.movePiece(p, from, to);
+		if(renderer != null) renderer.movePiece(p, from, to);		
+		hands.values().forEach((Hand h) -> h.reshuffle(1, renderer, PositionUtils.getExternalBorder(game.position)));
 	}
 
 	public void playPiece(Piece p, Coordinate at) {
 		// insert means playing piece form player's hand
-		Coordinate current = hands.get(p.color()).deallocate(p);
+		Coordinate current = hands.get(p.color()).removeFromHandAnyOfType(p);
 		movePiece(p, current, at);
 	}
 
@@ -44,7 +54,7 @@ public class PlayingField {
 
 	public void removePiece(Piece p, Coordinate at) {
 		// remove means put back to player's hand
-		movePiece(p, at, hands.get(p.color()).allocate(p));
+		movePiece(p, at, hands.get(p.color()).placeInHand(p));
 	}
 
 	public int width() { return width; }
@@ -52,7 +62,8 @@ public class PlayingField {
 	
 	public void showPossibleMoves(HashSet<Coordinate> moves) {
 		if(renderer != null) {
-			renderer.highlight(moves, HighlightType.MY_MOVES);
+			//renderer.highlight(moves, HighlightType.MY_MOVES);
+			renderer.highlight(PositionUtils.path, HighlightType.MY_MOVES);
 		}
 	}
 
@@ -67,4 +78,11 @@ public class PlayingField {
 			renderer.select(c);
 		}		
 	}
+	
+	public void displayExternalBorder(HashSet<Coordinate> cells) {
+		if(renderer != null) {
+			renderer.highlight(cells, HighlightType.BORDER);
+		}
+	}
+
 }

@@ -3,6 +3,8 @@ package hive.engine;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import hive.pieces.Piece;
+
 public final class Coordinate implements Serializable {
 	
 	private static final long serialVersionUID = -1924619317037201884L;
@@ -12,24 +14,39 @@ public final class Coordinate implements Serializable {
 		this.y = y; 
 		}
 	
-	static HashMap<Integer, HashMap<Integer, Coordinate>> pool = new HashMap<>();
+//	static HashMap<Integer, HashMap<Integer, Coordinate>> pool = new HashMap<>();
 	
-	private Object readResolve() {
-		return getInstance(this.x, this.y);
+	@Override 
+	public boolean equals(Object other) {
+		if (!(other instanceof Coordinate)) {
+			return false;
+		}
+		Coordinate c = (Coordinate) other;
+		return this.x == c.x && this.y == c.y;
 	}
 	
+	@Override 
+	public int hashCode() {
+		return 17 + 31 * x + y;
+	}
+	
+//	private Object readResolve() {
+//		return getInstance(this.x, this.y);
+//	}
+//	
 	private static Coordinate getInstance(int x, int y) {
-		HashMap<Integer, Coordinate> row = pool.getOrDefault(x,	null);
-		if(row == null) {
-			row = new HashMap<Integer, Coordinate>();
-			pool.put(x, row);
-		}
-		Coordinate cell = row.getOrDefault(y, null);
-		if(cell == null) {
-			cell = new Coordinate(x, y);
-			row.put(y, cell);
-		}
-		return cell;
+//		HashMap<Integer, Coordinate> row = pool.getOrDefault(x,	null);
+//		if(row == null) {
+//			row = new HashMap<Integer, Coordinate>();
+//			pool.put(x, row);
+//		}
+//		Coordinate cell = row.getOrDefault(y, null);
+//		if(cell == null) {
+//			cell = new Coordinate(x, y);
+//			row.put(y, cell);
+//		}
+//		return cell;
+		return new Coordinate(x, y);
 	}
 	
 	public static Coordinate cube(int x, int y, int z) {
