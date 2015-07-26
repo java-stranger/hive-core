@@ -1,29 +1,33 @@
 package hive.engine;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import hive.player.IPlayer;
 import hive.positions.CheckedPosition;
 import hive.positions.IPlayable;
 import hive.positions.IPosition;
 import hive.positions.ViewablePosition;
-import hive.test.Player;
+import hive.view.PlayingField;
 
 public class Game {
 	
-	public final HashMap<IPlayer.Color, Player> players = new HashMap<>();
+	public final HashMap<IPlayer.Color, IPlayer> players = new HashMap<>();
 	
-	public final ViewablePosition viewablePosition = new ViewablePosition();
+	protected final ViewablePosition viewablePosition = new ViewablePosition();
 	
-	public final IPlayable position = new CheckedPosition(viewablePosition);
+	protected final IPlayable position = new CheckedPosition(viewablePosition);
 	
-	private final ArrayList<Move> history = new ArrayList<>();
+	protected final MoveHistory moveHistory = new MoveHistory();
 	
 	public Game() {
 		for(IPlayer.Color c : IPlayer.Color.values()) {
 			players.put(c, new hive.test.Player(c));
 		}
+	}
+
+	public void subscribeView(PlayingField view) {
+		viewablePosition.subscribeView(view);
 	}
 
 	public void start() {
@@ -62,37 +66,47 @@ public class Game {
 	}
 	
 	public void makeMove(Move move) {
+		moveHistory.accept(move);
+		fastforwardMove();
+	}
+	
+	public void fastforwardMove() {
+		Move move = moveHistory.replayMove();
 		System.out.println("Make move: " + move);
 		position.accept(move);
-		history.add(move);
 		players.values().forEach((IPlayer pl) -> pl.notify(move));
 	}
 	
+	private void rollbackMove() {
+		Move m = moveHistory.rollback(1);
+		System.out.println("Undo move: " + m);
+		position.undo(m);
+		players.values().forEach((IPlayer pl) -> pl.notifyUndo(m));
+	}
+	
 	public void undoLastMove() {
-		if(!history.isEmpty()) {
-			Move m = history.remove(history.size() - 1);
-			System.out.println("Undo move: " + m);
-			position.undo(m);
-			players.values().forEach((IPlayer pl) -> pl.notifyUndo(m));
+		if(!moveHistory.isEmpty()) {
+			rollbackMove();
+		}
+	}
+	
+	public void goToNthMove(int n) {
+		if(n < 0 || n > moveHistory.size()) {
+			throw new IllegalArgumentException("Asked to go to " +n+ "th move, but only have " + moveHistory.size());
+		}
+		int to_rollback = moveHistory.current() - n;
+		if(to_rollback >= 0) {
+			for(int i = 0; i < to_rollback; ++i) {
+				rollbackMove();
+			}
+		} else {			
+			for(int i = 0; i < -to_rollback; ++i) {
+				fastforwardMove();
+			}
 		}
 	}
 
-	
-//		Piece p = position.getTopPieceAt(selected);
-//		if(p != null && p.color() == nextPlayer().color())
-//		{
-//			if(nextPlayer().remaining.contains(selected) 
-//					&& PositionUtils.getPossibleInsertionCells(position, p.color()).contains(c)) {
-//				// make this move!
-//				nextPlayer().remaining.remove(selected);
-//				makeMove(new Move(p, null, c));
-//			} else if(selected != null 
-//					&& p.getPossibleMoves(position, c).contains(c)) {
-//				makeMove(new Move(p, selected, c));
-//			} else {
-//				System.out.println("Moving " + selected + " to " + c + " is not allowed!");			
-//			}
-//		} else {
-//		}
-	
+	public void registerMoveHistoryListeners(List<IMoveHistoryListener> listeners) {
+		moveHistory.registerMoveHistoryListeners(listeners);
+	}
 }

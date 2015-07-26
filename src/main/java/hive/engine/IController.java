@@ -18,4 +18,8 @@ public interface IController {
 
 	void onClick(Coordinate c);
 
+	void onMoveSelectedFromHistory(int selectionIndex);
+
+	void addMoveHistoryListener(IMoveHistoryListener listener);
+
 }

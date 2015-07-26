@@ -1,22 +1,22 @@
 package hive.engine;
 
-import hive.actions.Action;
-import hive.actions.Action.ActionType;
-import hive.pieces.Piece;
-import hive.view.Hand;
+import java.util.ArrayList;
+import java.util.List;
+
 import hive.view.Table;
 
 public abstract class Controller implements IController {
 
-	final Table view;
-	final Game game;
+	Table view;
+	Game game;
 	
-	final ActionController actionCtrl;
+	ActionController actionCtrl;
 	
-	public Controller(Game game, Table view) {
+	public void setGameAndView(Game game, Table view) {
 		this.game = game;
 		this.view = view;
 		actionCtrl = new ActionController(this, view, game.position());
+		game.registerMoveHistoryListeners(moveListeners);
 	}
 	
 	/* (non-Javadoc)
@@ -65,5 +65,15 @@ public abstract class Controller implements IController {
 	public void onClick(Coordinate c) {
 		actionCtrl.onClick(c);
 	}
+	
+	public void onMoveSelectedFromHistory(int selectionIndex) {
+		game.goToNthMove(selectionIndex);
+	}
+	
+	List<IMoveHistoryListener> moveListeners = new ArrayList<>();
+	public void addMoveHistoryListener(IMoveHistoryListener listener) {
+		moveListeners.add(listener);
+	}
+
 
 }

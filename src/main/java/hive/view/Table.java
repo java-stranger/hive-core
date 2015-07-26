@@ -25,7 +25,7 @@ public class Table {
 		
 		initHands();
 		
-		game.viewablePosition.subscribeView(field);
+		game.subscribeView(field);
 	}
 	
 	private void initHands() {
@@ -73,10 +73,10 @@ public class Table {
 	public void onPieceChoosenInHand(Piece p, Coordinate c) {
 		if(p.color() == game.nextPlayer().color()) {
 			System.out.println("Showing possible moves (insertion)");			
-			field.showPossibleMoves(PositionUtils.getPossibleInsertionCells(game.position, game.nextPlayer().color()));
+			field.showPossibleMoves(PositionUtils.getPossibleInsertionCells(game.position(), game.nextPlayer().color()));
 		} else {
 			System.out.println("Showing adversary possible moves (insertion)");			
-			field.showAdversaryMoves(PositionUtils.getPossibleInsertionCells(game.position, p.color()));
+			field.showAdversaryMoves(PositionUtils.getPossibleInsertionCells(game.position(), p.color()));
 		}
 		field.setSelected(c);
 	}
@@ -84,10 +84,10 @@ public class Table {
 	public void onPieceChoosenInField(Piece p, Coordinate c) {
 		if(p.color() == game.nextPlayer().color()) {
 			System.out.println("Showing possible moves");			
-			field.showPossibleMoves(p.getPossibleMoves(game.position, c));
+			field.showPossibleMoves(p.getPossibleMoves(game.position(), c));
 		} else {
 			System.out.println("Showing adversary possible moves");			
-			field.showAdversaryMoves(p.getPossibleMoves(game.position, c));
+			field.showAdversaryMoves(p.getPossibleMoves(game.position(), c));
 		}
 		field.setSelected(c);
 	}
@@ -100,7 +100,7 @@ public class Table {
 
 	
 	public void displayExternalBorder() {
-		field.displayExternalBorder(PositionUtils.getExternalBorder(game.position));
+		field.displayExternalBorder(PositionUtils.getExternalBorder(game.position()));
 	}
 
 }
